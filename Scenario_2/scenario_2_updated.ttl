@@ -1,0 +1,113 @@
+@prefix : <http://example.org/scenario2#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+<http://example.org/scenario2> rdf:type owl:Ontology .
+
+:Entity rdf:type owl:Class .
+:Categorization rdf:type owl:Class .
+:Intercalation rdf:type owl:Class .
+:Relationship rdf:type owl:Class .
+:Participation rdf:type owl:Class .
+:Marker rdf:type owl:Class .
+
+:hasCustodian rdf:type owl:ObjectProperty .
+:hasTag rdf:type owl:ObjectProperty .
+:involvesType rdf:type owl:ObjectProperty .
+:isConnectedTo rdf:type owl:ObjectProperty .
+:hasName rdf:type owl:ObjectProperty .
+:hasDeclaredType rdf:type owl:ObjectProperty .
+
+:Person rdf:type :Entity .
+:FemalePerson rdf:type :Entity .
+:Mother rdf:type :Entity .
+
+:GrantPlinth rdf:type :Entity .
+:MrsPlinth rdf:type :Entity .
+
+:C1 rdf:type :Categorization .
+
+:I1 rdf:type :Intercalation ;
+    :hasCustodian :C1 ;
+    :hasTag :Specialization ;
+    :involvesType :FemalePerson .
+
+:I2 rdf:type :Intercalation ;
+    :hasCustodian :C1 ;
+    :hasTag :Generalization ;
+    :involvesType :Person .
+
+:C2 rdf:type :Categorization .
+
+:I3 rdf:type :Intercalation ;
+    :hasCustodian :C2 ;
+    :hasTag :Specialization ;
+    :involvesType :Mother .
+
+:I4 rdf:type :Intercalation ;
+    :hasCustodian :C2 ;
+    :hasTag :Generalization ;
+    :involvesType :FemalePerson .
+
+:R1 rdf:type :Relationship .
+
+:P1 rdf:type :Participation ;
+    :hasCustodian :R1 ;
+    :isConnectedTo :Person ;
+    :hasName :Parent .
+
+:P2 rdf:type :Participation ;
+    :hasCustodian :R1 ;
+    :isConnectedTo :Person ;
+    :hasName :Undefined .
+
+:R2 rdf:type :Relationship .
+
+:P3 rdf:type :Participation ;
+    :hasCustodian :R2 ;
+    :isConnectedTo :Mother ;
+    :hasName :Undefined .
+
+:P4 rdf:type :Participation ;
+    :hasCustodian :R2 ;
+    :isConnectedTo :Person ;
+    :hasName :Child .
+
+:M_role rdf:type :Marker ;
+        :hasTag :role ;
+        :hasCustodian :Mother .
+
+:GrantPlinth :hasDeclaredType :Person .
+:MrsPlinth :hasDeclaredType :Mother .
+
+:R3 rdf:type :Relationship .
+
+:P5 rdf:type :Participation ;
+    :hasCustodian :R3 ;
+    :isConnectedTo :MrsPlinth ;
+    :hasName :Mother .
+
+:P6 rdf:type :Participation ;
+    :hasCustodian :R3 ;
+    :isConnectedTo :GrantPlinth ;
+    :hasName :Undefined .
+
+:Mother rdf:type owl:Class ;
+        rdfs:subClassOf :FemalePerson .
+
+:Child rdf:type owl:ObjectProperty ;
+       rdfs:domain :Mother ;
+       rdfs:range :Person ;
+       owl:inverseOf :Parent .
+
+:Parent rdf:type owl:ObjectProperty .
+
+:Mother rdf:type owl:ObjectProperty ;
+        rdfs:subPropertyOf :Parent .
+
+:GrantPlinth rdf:type :Person .
+
+:MrsPlinth rdf:type :FemalePerson .
+
+:GrantPlinth :Mother :MrsPlinth .

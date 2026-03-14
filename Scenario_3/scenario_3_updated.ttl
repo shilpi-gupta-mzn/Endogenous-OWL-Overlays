@@ -1,0 +1,83 @@
+@prefix : <http://example.org/scenario3#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+<http://example.org/scenario3> rdf:type owl:Ontology .
+
+:Entity rdf:type owl:Class .
+:Relationship rdf:type owl:Class .
+:Participation rdf:type owl:Class .
+
+:hasCustodian rdf:type owl:ObjectProperty .
+:isConnectedTo rdf:type owl:ObjectProperty .
+:hasName rdf:type owl:ObjectProperty .
+:hasDeclaredType rdf:type owl:ObjectProperty .
+
+:hasParent rdf:type owl:ObjectProperty .
+:hasChild rdf:type owl:ObjectProperty .
+
+:hasGrandparent rdf:type owl:ObjectProperty ;
+                owl:propertyChainAxiom ( :hasParent :hasParent ) .
+
+:Person rdf:type :Entity .
+
+:GrantPlinth rdf:type :Entity .
+:MrPlinth rdf:type :Entity .
+:OldMrPlinth rdf:type :Entity .
+
+:R1 rdf:type :Relationship .
+
+:P1 rdf:type :Participation ;
+    :hasCustodian :R1 ;
+    :isConnectedTo :Person ;
+    :hasName :hasParent .
+
+:P2 rdf:type :Participation ;
+    :hasCustodian :R1 ;
+    :isConnectedTo :Person ;
+    :hasName :hasChild .
+
+:R2 rdf:type :Relationship .
+
+:P3 rdf:type :Participation ;
+    :hasCustodian :R2 ;
+    :isConnectedTo :Person ;
+    :hasName :hasGrandparent .
+
+:P4 rdf:type :Participation ;
+    :hasCustodian :R2 ;
+    :isConnectedTo :Person ;
+    :hasName :hasChild .
+
+:GrantPlinth :hasDeclaredType :Person .
+:MrPlinth :hasDeclaredType :Person .
+:OldMrPlinth :hasDeclaredType :Person .
+
+:R3 rdf:type :Relationship .
+
+:P5 rdf:type :Participation ;
+    :hasCustodian :R3 ;
+    :isConnectedTo :GrantPlinth ;
+    :hasName :Undefined .
+
+:P6 rdf:type :Participation ;
+    :hasCustodian :R3 ;
+    :isConnectedTo :MrPlinth ;
+    :hasName :hasParent .
+
+:R4 rdf:type :Relationship .
+
+:P7 rdf:type :Participation ;
+    :hasCustodian :R4 ;
+    :isConnectedTo :MrPlinth ;
+    :hasName :Undefined .
+
+:P8 rdf:type :Participation ;
+    :hasCustodian :R4 ;
+    :isConnectedTo :OldMrPlinth ;
+    :hasName :hasParent .
+
+:GrantPlinth :hasParent :MrPlinth .
+
+:MrPlinth :hasParent :OldMrPlinth .
