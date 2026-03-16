@@ -1,0 +1,92 @@
+@prefix : <http://example.org/scenario4#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+<http://example.org/scenario4> rdf:type owl:Ontology .
+
+
+:Entity rdf:type owl:Class .
+:Marker rdf:type owl:Class .
+:Categorization rdf:type owl:Class .
+:Intercalation rdf:type owl:Class .
+
+:hasTag rdf:type owl:ObjectProperty .
+:hasCustodian rdf:type owl:ObjectProperty .
+:refersTo rdf:type owl:ObjectProperty .
+:hasDeclaredType rdf:type owl:ObjectProperty .
+:involvesType rdf:type owl:ObjectProperty .
+:partitionedBy rdf:type owl:ObjectProperty .
+
+:PersonType rdf:type :Entity .
+
+:M rdf:type :Marker ;
+    :hasTag :PartitioningPowertype ;
+    :hasCustodian :Person ;
+    :refersTo :PersonType .
+
+:Person rdf:type :Entity .
+:MalePerson rdf:type :Entity .
+:FemalePerson rdf:type :Entity .
+:MixedPerson rdf:type :Entity .
+
+:MalePerson :hasDeclaredType :PersonType .
+:FemalePerson :hasDeclaredType :PersonType .
+
+:C1 rdf:type :Categorization .
+
+:I1 rdf:type :Intercalation ;
+    :hasCustodian :C1 ;
+    :hasTag :Specialization ;
+    :involvesType :MalePerson .
+
+:I2 rdf:type :Intercalation ;
+    :hasCustodian :C1 ;
+    :hasTag :Specialization ;
+    :involvesType :FemalePerson .
+
+:I3 rdf:type :Intercalation ;
+    :hasCustodian :C1 ;
+    :hasTag :Generalization ;
+    :involvesType :Person .
+
+:C2 rdf:type :Categorization .
+
+:I4 rdf:type :Intercalation ;
+    :hasCustodian :C2 ;
+    :hasTag :Specialization ;
+    :involvesType :MixedPerson .
+
+:I5 rdf:type :Intercalation ;
+    :hasCustodian :C2 ;
+    :hasTag :Generalization ;
+    :involvesType :MalePerson .
+
+
+:C3 rdf:type :Categorization .
+
+:I6 rdf:type :Intercalation ;
+    :hasCustodian :C3 ;
+    :hasTag :Specialization ;
+    :involvesType :MixedPerson .
+
+:I7 rdf:type :Intercalation ;
+    :hasCustodian :C3 ;
+    :hasTag :Generalization ;
+    :involvesType :FemalePerson .
+
+
+
+:PersonType rdf:type owl:Class .
+
+:MalePerson rdf:type :PersonType .
+:FemalePerson rdf:type :PersonType .
+:MixedPerson rdf:type :PersonType .
+
+:Person :partitionedBy :PersonType .
+
+:MalePerson owl:disjointWith :FemalePerson .
+:FemalePerson owl:disjointWith :MalePerson .
+
+:MixedPerson rdfs:subClassOf :MalePerson .
+:MixedPerson rdfs:subClassOf :FemalePerson .
