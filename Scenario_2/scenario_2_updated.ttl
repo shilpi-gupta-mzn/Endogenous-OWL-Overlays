@@ -1,9 +1,10 @@
-@prefix : <http://example.org/scenario2#> .
+@prefix : <http://example.org/scenario#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
-<http://example.org/scenario2> rdf:type owl:Ontology .
+<http://example.org/scenario> rdf:type owl:Ontology .
+
 
 :Entity rdf:type owl:Class .
 :Categorization rdf:type owl:Class .
@@ -12,6 +13,8 @@
 :Participation rdf:type owl:Class .
 :Marker rdf:type owl:Class .
 
+
+
 :hasCustodian rdf:type owl:ObjectProperty .
 :hasTag rdf:type owl:ObjectProperty .
 :involvesType rdf:type owl:ObjectProperty .
@@ -19,24 +22,15 @@
 :hasName rdf:type owl:ObjectProperty .
 :hasDeclaredType rdf:type owl:ObjectProperty .
 
+
+
 :Person rdf:type :Entity .
-:FemalePerson rdf:type :Entity .
 :Mother rdf:type :Entity .
 
 :GrantPlinth rdf:type :Entity .
 :MrsPlinth rdf:type :Entity .
 
-:C1 rdf:type :Categorization .
 
-:I1 rdf:type :Intercalation ;
-    :hasCustodian :C1 ;
-    :hasTag :Specialization ;
-    :involvesType :FemalePerson .
-
-:I2 rdf:type :Intercalation ;
-    :hasCustodian :C1 ;
-    :hasTag :Generalization ;
-    :involvesType :Person .
 
 :C2 rdf:type :Categorization .
 
@@ -48,7 +42,9 @@
 :I4 rdf:type :Intercalation ;
     :hasCustodian :C2 ;
     :hasTag :Generalization ;
-    :involvesType :FemalePerson .
+    :involvesType :Person .
+
+
 
 :R1 rdf:type :Relationship .
 
@@ -62,6 +58,7 @@
     :isConnectedTo :Person ;
     :hasName :Undefined .
 
+
 :R2 rdf:type :Relationship .
 
 :P3 rdf:type :Participation ;
@@ -74,12 +71,18 @@
     :isConnectedTo :Person ;
     :hasName :Child .
 
+
+
 :M_role rdf:type :Marker ;
         :hasTag :role ;
         :hasCustodian :Mother .
 
+
+
 :GrantPlinth :hasDeclaredType :Person .
 :MrsPlinth :hasDeclaredType :Mother .
+
+
 
 :R3 rdf:type :Relationship .
 
@@ -93,8 +96,9 @@
     :isConnectedTo :GrantPlinth ;
     :hasName :Undefined .
 
-:Mother rdf:type owl:Class ;
-        rdfs:subClassOf :FemalePerson .
+
+
+:Mother rdf:type owl:Class .
 
 :Child rdf:type owl:ObjectProperty ;
        rdfs:domain :Mother ;
@@ -107,7 +111,5 @@
         rdfs:subPropertyOf :Parent .
 
 :GrantPlinth rdf:type :Person .
-
-:MrsPlinth rdf:type :FemalePerson .
 
 :GrantPlinth :Mother :MrsPlinth .
