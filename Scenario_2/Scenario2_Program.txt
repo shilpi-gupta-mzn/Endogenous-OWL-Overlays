@@ -1,0 +1,155 @@
+% Scenario 2 Datalog Program ----------------------------------------------------------
+
+
+% Original Model---------------------------------------------------------
+
+% O1 -------------
+
+Entity(Person).
+Entity(Mother).
+
+Categorization(C2).
+Intercalation(I3).
+Intercalation(I4).
+hasCustodian(I3, C2).
+hasCustodian(I4, C2).
+hasTag(I3, Specialization).
+hasTag(I4, Generalization).
+involvesType(I3, Mother).
+involvesType(I4, Person).
+
+Relationship(R1).
+Participation(P1).
+Participation(P2).
+hasCustodian(P1, R1).
+hasCustodian(P2, R1).
+isConnectedTo(P1, Person).
+isConnectedTo(P2, Person).
+hasName(P1, Parent).
+hasName(P2, Undefined).
+
+Relationship(R2).
+Participation(P3).
+Participation(P4).
+hasCustodian(P3, R2).
+hasCustodian(P4, R2).
+isConnectedTo(P3, Mother).
+isConnectedTo(P4, Person).
+hasName(P3, Undefined).
+hasName(P4, Child).
+
+Marker(M_role).
+hasTag(M_role, role).
+hasCustodian(M_role, Mother).
+
+
+% O2 -------------
+
+Entity(GrantPlinth).
+Entity(MrsPlinth).
+
+hasDeclaredType(GrantPlinth, Person).
+hasDeclaredType(MrsPlinth, Mother).
+
+Relationship(R3).
+Participation(P5).
+Participation(P6).
+hasCustodian(P5, R3).
+hasCustodian(P6, R3).
+isConnectedTo(P5, MrsPlinth).
+isConnectedTo(P6, GrantPlinth).
+hasName(P5, Mother).
+hasName(P6, Undefined).
+
+
+
+% Overlay Derivation Rules (Rule set R2 = R1 ∪ ∆R2) ---------------
+
+% Rule set R1 ----------------------------
+
+subPropertyOf(?X, ?Y) :- hasName(?P, ?X), hasCustodian(?M, ?X), hasTag(?M, SubsetOf), refersTo(?M, ?Y).
+@export subPropertyOf :- csv{}.
+
+subClassOf(?X, ?Y) :- involvesType(?I1, ?X), hasCustodian(?I1, ?C1), hasTag(?I1, Specialization), hasCustodian(?I2, ?C1), hasTag(?I2, Generalization), involvesType(?I2, ?Y).
+subClassOf(?X, ?Y) :- subClassOf(?X, ?Z), subClassOf(?Z, ?Y).
+@export subClassOf :- csv{}.
+
+type(?X, ?Y) :- hasDeclaredType(?X, ?Y).
+type(?X, ?Y) :- hasDeclaredType(?X, ?Z), subClassOf(?Z, ?Y).
+type(?X, ?Y) :- type(?X, ?T), type(?T, ?Y).
+@export type :- csv{}.
+
+propertyAssertion(?S, ?N1, ?O):- isConnectedTo(?P1, ?S), hasCustodian(?P1, ?R), hasCustodian(?P, ?R), isConnectedTo(?P, ?O), hasName(?P, ?N1), ?N1 != Undefined, ?P != ?P1.
+propertyAssertion(?S, ?P, ?O):- isConnectedTo(?P1, ?S), hasCustodian(?P1, ?R), hasCustodian(?P, ?R), isConnectedTo(?P, ?O), hasName(?P, ?N1), ?N1 = Undefined, ?P != ?P1.
+@export propertyAssertion :- csv{}.
+
+
+
+% Rule set ∆R2 -------------------------
+
+roleClass(?C) :- Marker(?M), hasTag(?M, role), hasCustodian(?M, ?C).
+
+inducedProperty(?P, ?X) :- Participation(?P), hasName(?P, ?X), ?X != Undefined.
+inducedProperty(?P, ?X) :-Participation(?P), hasName(?P, Undefined), isConnectedTo(?P, ?X), roleClass(?X).
+@export inducedProperty :- csv{}.
+
+ObjectProperty(?O) :- inducedProperty(?P, ?O).
+@export ObjectProperty :- csv{}.
+
+otherEndClass(?P, ?X) :- hasCustodian(?P, ?R), hasCustodian(?Q, ?R), ?P != ?Q, isConnectedTo(?Q, ?X).
+
+sameNavigationFamily(?P, ?Q) :- inducedProperty(?P, ?X), inducedProperty(?Q, ?Y), otherEndClass(?P, ?D), otherEndClass(?Q, ?D), ?P != ?Q.
+
+domain(?X, ?D) :- inducedProperty(?P, ?X), otherEndClass(?P, ?D).
+@export domain :- csv{}.
+
+range(?X, ?R) :- inducedProperty(?P, ?X), isConnectedTo(?P, ?R).
+@export range :- csv{}.
+
+subPropertyOf(?X, ?Y) :- inducedProperty(?P, ?X), inducedProperty(?Q, ?Y), sameNavigationFamily(?P, ?Q), domain(?X, ?D), domain(?Y, ?D), range(?X, ?A), range(?Y, ?B), subClassOf(?A, ?B), ?X != ?Y.
+@export subPropertyOf :- csv{}.
+
+InverseOf(?Y, ?Z) :- hasCustodian(?P, ?R), hasCustodian(?Q, ?R), ?P != ?Q, inducedProperty(?P, ?X), hasName(?Q, ?Y), ?Y != Undefined, subPropertyOf(?X, ?Z), ?X != ?Z, ?Y != ?Z.
+@export InverseOf :- csv{}.
+
+
+
+% Generated Overlay Assertions -------------------------------------
+
+domain(Mother, Person).
+domain(Mother, GrantPlinth).
+domain(Parent, Person).
+domain(Child, Mother).
+
+inducedProperty(P1, Parent).
+inducedProperty(P3, Mother).
+inducedProperty(P4, Child).
+inducedProperty(P5, Mother).
+
+InverseOf(Child, Parent).
+
+ObjectProperty(Mother).
+ObjectProperty(Parent).
+ObjectProperty(Child).
+
+propertyAssertion(Person, P2, Person).
+propertyAssertion(Person, Parent, Person).
+propertyAssertion(Person, P3, Mother).
+propertyAssertion(Mother, Child, Person).
+propertyAssertion(GrantPlinth, Mother, MrsPlinth).
+propertyAssertion(MrsPlinth, P6, GrantPlinth).
+
+range(Mother, Mother).
+range(Mother, MrsPlinth).
+range(Parent, Person).
+range(Child, Person).
+subClassOf(Mother, Person).
+subPropertyOf(Mother, Parent).
+
+type(GrantPlinth, Person).
+type(MrsPlinth, Person).
+type(MrsPlinth, Mother).
+
+
+
+
