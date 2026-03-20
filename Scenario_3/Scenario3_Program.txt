@@ -1,0 +1,172 @@
+% Scenario 3 Datalog Program ----------------------------------------------------------
+
+
+% Original Model ---------------------------------------------------------------
+
+% O1 -------------
+
+Entity(Person).
+
+Relationship(R1).
+Participation(P1).
+Participation(P2).
+hasCustodian(P1, R1).
+hasCustodian(P2, R1).
+isConnectedTo(P1, Person).
+isConnectedTo(P2, Person).
+hasName(P1, hasParent).
+hasName(P2, hasChild).
+
+Relationship(R2).
+Participation(P3).
+Participation(P4).
+hasCustodian(P3, R2).
+hasCustodian(P4, R2).
+isConnectedTo(P3, Person).
+isConnectedTo(P4, Person).
+hasName(P3, hasGrandparent).
+hasName(P4, hasChild).
+
+
+% O2 -------------
+
+Entity(GrantPlinth).
+Entity(MrPlinth).
+Entity(OldMrPlinth).
+
+hasDeclaredType(GrantPlinth, Person).
+hasDeclaredType(MrPlinth, Person).
+hasDeclaredType(oldMrPlinth, Person).
+
+Relationship(R3).
+Participation(P5).
+Participation(P6).
+hasCustodian(P5, R3).
+hasCustodian(P6, R3).
+isConnectedTo(P5, GrantPlinth).
+isConnectedTo(P6, MrPlinth).
+hasName(P5, Undefined).
+hasName(P6, hasParent).
+
+Relationship(R4).
+Participation(P7).
+Participation(P8).
+hasCustodian(P7, R4).
+hasCustodian(P8, R4).
+isConnectedTo(P7, MrPlinth).
+isConnectedTo(P8, oldMrPlinth).
+hasName(P7, Undefined).
+hasName(P8, hasParent).
+
+
+% Overlay included in the reasoner input---------------------------
+
+% hasGrandParent owl:propertyChainAxiom (:hasParent :hasParent)
+
+
+% Overlay Derivation Rules (Rule set R3 = R2 ∪ ∆R3) ---------------
+
+% Rule set R2 ----------------------------
+
+subPropertyOf(?X, ?Y) :- hasName(?P, ?X), hasCustodian(?M, ?X), hasTag(?M, SubsetOf), refersTo(?M, ?Y).
+@export subPropertyOf :- csv{}.
+
+subClassOf(?X, ?Y) :- involvesType(?I1, ?X), hasCustodian(?I1, ?C1), hasTag(?I1, Specialization), hasCustodian(?I2, ?C1), hasTag(?I2, Generalization), involvesType(?I2, ?Y).
+subClassOf(?X, ?Y) :- subClassOf(?X, ?Z), subClassOf(?Z, ?Y).
+@export subClassOf :- csv{}.
+
+type(?X, ?Y) :- hasDeclaredType(?X, ?Y).
+type(?X, ?Y) :- hasDeclaredType(?X, ?Z), subClassOf(?Z, ?Y).
+type(?X, ?Y) :- type(?X, ?T), type(?T, ?Y).
+@export type :- csv{}.
+
+propertyAssertion(?S, ?N1, ?O):- isConnectedTo(?P1, ?S), hasCustodian(?P1, ?R), hasCustodian(?P, ?R), isConnectedTo(?P, ?O), hasName(?P, ?N1), ?N1 != Undefined, ?P != ?P1.
+propertyAssertion(?S, ?P, ?O):- isConnectedTo(?P1, ?S), hasCustodian(?P1, ?R), hasCustodian(?P, ?R), isConnectedTo(?P, ?O), hasName(?P, ?N1), ?N1 = Undefined, ?P != ?P1.
+@export propertyAssertion :- csv{}.
+
+roleClass(?C) :- Marker(?M), hasTag(?M, role), hasCustodian(?M, ?C).
+
+inducedProperty(?P, ?X) :- Participation(?P), hasName(?P, ?X), ?X != Undefined.
+inducedProperty(?P, ?X) :-Participation(?P), hasName(?P, Undefined), isConnectedTo(?P, ?X), roleClass(?X).
+@export inducedProperty :- csv{}.
+
+ObjectProperty(?O) :- inducedProperty(?P, ?O).
+@export ObjectProperty :- csv{}.
+
+otherEndClass(?P, ?X) :- hasCustodian(?P, ?R), hasCustodian(?Q, ?R), ?P != ?Q, isConnectedTo(?Q, ?X).
+
+sameNavigationFamily(?P, ?Q) :- inducedProperty(?P, ?X), inducedProperty(?Q, ?Y), otherEndClass(?P, ?D), otherEndClass(?Q, ?D), ?P != ?Q.
+
+domain(?X, ?D) :- inducedProperty(?P, ?X), otherEndClass(?P, ?D).
+@export domain :- csv{}.
+
+range(?X, ?R) :- inducedProperty(?P, ?X), isConnectedTo(?P, ?R).
+@export range :- csv{}.
+
+subPropertyOf(?X, ?Y) :- inducedProperty(?P, ?X), inducedProperty(?Q, ?Y), sameNavigationFamily(?P, ?Q), domain(?X, ?D), domain(?Y, ?D), range(?X, ?A), range(?Y, ?B), subClassOf(?A, ?B), ?X != ?Y.
+@export subPropertyOf :- csv{}.
+
+InverseOf(?Y, ?Z) :- hasCustodian(?P, ?R), hasCustodian(?Q, ?R), ?P != ?Q, inducedProperty(?P, ?X), hasName(?Q, ?Y), ?Y != Undefined, subPropertyOf(?X, ?Z), ?X != ?Z, ?Y != ?Z.
+@export InverseOf :- csv{}.
+
+
+
+% Generated Overlay Assertions -------------------------------------
+
+ObjectProperty(hasChild).
+ObjectProperty(hasParent).
+ObjectProperty(hasGrandParent).
+
+domain(hasParent, Person).
+domain(hasParent, GrantPlinth).
+domain(hasParent, MrPlinth).
+domain(hasChild, Person).
+domain(hasGrandParent, Person).
+
+range(hasParent, Person).
+range(hasParent, MrPlinth).
+range(hasParent, oldMrPlinth).
+range(hasChild, Person).
+range(hasGrandParent, Person).
+
+inducedProperty(P1, hasParent).
+inducedProperty(P2, hasChild).
+inducedProperty(P3, hasGrandParent).
+inducedProperty(P4, hasChild).
+inducedProperty(P6, hasParent).
+inducedProperty(P8, hasParent).
+
+propertyAssertion(Person, hasParent, Person).
+propertyAssertion(Person, hasChild, Person).
+propertyAssertion(Person, hasGrandParent, Person).
+propertyAssertion(GrantPlinth, hasParent, MrPlinth).
+propertyAssertion(MrPlinth, hasParent, oldMrPlinth).
+propertyAssertion(MrPlinth, P5, GrantPlinth).
+propertyAssertion(oldMrPlinth, P7, MrPlinth).
+
+
+
+% After reasoner execution-----------------------------------------------
+
+% Manually Updated Model  -----------------------------------------------
+
+Relationship(R5).
+Participation(P9).
+Participation(P10).
+hasCustodian(P9, R5).
+hasCustodian(P10, R5).
+isConnectedTo(P9, oldMrPlinth).
+isConnectedTo(P10, GrantPlinth).
+hasName(P9, hasGrandParent).
+hasName(P10, Undefined).
+
+
+% Additionally Generated Assertion------------------------------------
+
+┌──────────────────────────────────┐
+│ hasGrandParent(GrantPlinth, oldMrPlinth)    │
+└──────────────────────────────────┘
+
+
+
+
