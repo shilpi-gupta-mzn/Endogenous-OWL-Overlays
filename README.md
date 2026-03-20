@@ -1,10 +1,10 @@
 # Supporting OWL-Style Reasoning over UML-Style Models via Endogenous OWL Overlays
 
 ## Overview
-This repository contains the implementation and experimental artifacts for the research work: "Supporting OWL-Style Reasoning over UML-Style Models via Endogenous OWL Overlays." The goal of this work is to demonstrate how OWL-style reasoning can be supported for UML-style models through the use of endogenous OWL overlays. The repository provides the program files, generated overlay assertions, reasoning inputs, and result screenshots used in the experiments.
+This repository contains the implementation and experimental artifacts for the research work: "Supporting OWL-Style Reasoning over UML-Style Models via Endogenous OWL Overlays." The goal of this work is to demonstrate how OWL-style reasoning can be supported for UML-style models through the use of endogenous OWL overlays. The repository provides the program files and turtle files used in the experiment along with reasoning output screenshots.
 
 ## Implementation Workflow
-The implementation follows a multi-step reasoning workflow involving rule-based overlay generation and ontology reasoning.
+The implementation follows a workflow involving rule-based overlay generation and ontology reasoning.
 
 ### Step 1 – Original Model Facts
 * Each program file contains facts extracted from the original UML-style model.
