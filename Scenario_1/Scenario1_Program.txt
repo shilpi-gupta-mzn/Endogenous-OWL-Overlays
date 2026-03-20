@@ -1,0 +1,129 @@
+% Scenario 1 Datalog Program -------------------------------------------------------
+
+
+% Original Model ------------------------------------------------------
+
+% O1 -------------
+
+Entity(Person).
+Entity(MalePerson).
+
+Categorization(C1).
+Intercalation(I1).
+Intercalation(I2).
+hasCustodian(I1, C1).
+hasCustodian(I2, C1).
+hasTag(I1,Specialization).
+hasTag(I2,Generalization).
+involvesType(I1, MalePerson).
+involvesType(I2, Person).
+
+Relationship(R1).
+Participation(P1).
+Participation(P2).
+hasCustodian(P1, R1).
+hasCustodian(P2, R1).
+isConnectedTo(P1, Person).
+isConnectedTo(P2, Person).
+hasName(P1, hasParent).
+hasName(P2, Undefined).
+
+Relationship(R2).
+Participation(P3).
+Participation(P4).
+hasCustodian(P3, R2).
+hasCustodian(P4, R2).
+isConnectedTo(P3, MalePerson).
+isConnectedTo(P4, Person).
+hasName(P3, hasFather).
+hasName(P4, Undefined).
+
+Marker(M).
+hasTag(M, SubsetOf).
+hasCustodian(M, hasFather).
+refersTo(M, hasParent).
+
+% O2 -------------
+
+Entity(GrantPlinth).
+Entity(MrPlinth).
+
+hasDeclaredType(GrantPlinth, MalePerson).
+hasDeclaredType(MrPlinth, MalePerson).
+
+Relationship(R3).
+Participation(P5).
+Participation(P6).
+hasCustodian(P5, R3).
+hasCustodian(P6, R3).
+isConnectedTo(P5, MrPlinth).
+isConnectedTo(P6, GrantPlinth).
+hasName(P5, hasFather).
+hasName(P6, Undefined).
+
+
+
+% Overlay Derivation Rules---------------
+
+% Rule set R1----------------------------
+
+subPropertyOf(?X, ?Y) :- hasName(?P, ?X), hasCustodian(?M, ?X), hasTag(?M, SubsetOf), refersTo(?M, ?Y).
+@export subPropertyOf :- csv{}.
+
+subClassOf(?X, ?Y) :- involvesType(?I1, ?X), hasCustodian(?I1, ?C1), hasTag(?I1, Specialization), hasCustodian(?I2, ?C1), hasTag(?I2, Generalization), involvesType(?I2, ?Y).
+subClassOf(?X, ?Y) :- subClassOf(?X, ?Z), subClassOf(?Z, ?Y).
+@export subClassOf :- csv{}.
+
+type(?X, ?Y) :- hasDeclaredType(?X, ?Y).
+type(?X, ?Y) :- hasDeclaredType(?X, ?Z), subClassOf(?Z, ?Y).
+type(?X, ?Y) :- type(?X, ?T), type(?T, ?Y).
+@export type :- csv{}.
+
+propertyAssertion(?S, ?N, ?O):- isConnectedTo(?Q, ?S), hasCustodian(?Q, ?R), hasCustodian(?P, ?R), isConnectedTo(?P, ?O), hasName(?P, ?N), ?N != Undefined, ?P != ?Q.
+propertyAssertion(?S, ?P, ?O):- isConnectedTo(?Q, ?S), hasCustodian(?Q, ?R), hasCustodian(?P, ?R), isConnectedTo(?P, ?O), hasName(?P, ?N), ?N = Undefined, ?P != ?Q.
+@export propertyAssertion :- csv{}.
+
+
+
+% Generated Overlay Assertions --------------------------------------
+
+type(GrantPlinth, Person).
+type(GrantPlinth, MalePerson).
+type(MrPlinth, Person).
+type(MrPlinth, MalePerson).
+
+subPropertyOf(hasFather,hasParent).
+
+subClassOf(MalePerson,Person).
+
+propertyAssertion(Person, P2, Person).
+propertyAssertion(Person, hasParent, Person).
+propertyAssertion(Person, hasFather, MalePerson).
+propertyAssertion(MalePerson, P4, Person).
+propertyAssertion(GrantPlinth, hasFather, MrPlinth).
+propertyAssertion(MrPlinth, P6, GrantPlinth).
+
+
+% After reasoner execution-----------------------------------------------
+
+% Manually Updated Model  -----------------------------------------------
+
+Relationship(R4).
+Participation(P7).
+Participation(P8).
+hasCustodian(P7, R4).
+hasCustodian(P8, R4).
+isConnectedTo(P7, MrPlinth).
+isConnectedTo(P8, GrantPlinth).
+hasName(P7, hasParent).
+hasName(P8, Undefined).
+
+
+% Additionally Generated Assertion------------------------------------
+
+┌──────────────────────────────────┐
+│ hasParent(GrantPlinth, MrPlinth)            │
+└──────────────────────────────────┘
+
+
+
