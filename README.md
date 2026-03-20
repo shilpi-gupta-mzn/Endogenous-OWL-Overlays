@@ -11,12 +11,12 @@ The implementation follows a workflow involving rule-based overlay generation an
 * Output produced: Generated overlay assertions.
 
 ### Step 2 – Generation of Turtle Files
-* The original model facts and generated overlay assertions are exported in Turtle format (.ttl).
+* The original model facts and generated overlay assertions are exported in Turtle (.ttl).
 * These files are used as input for ontology reasoning.
 
 ### Step 3 – Execution on Reasoner
-* The generated .ttl files are loaded into Protégé with the HermiT Reasoner.
-* After executing the reasoner, inferred assertions and diagnostics are produced based on the overlay semantics.
+* The generated turtle files are loaded into Protégé with the HermiT Reasoner.
+* After executing the reasoner inferred assertions and diagnostics are produced based on the overlay semantics.
 
 ### Step 4 – Visualization of Results
 * The reasoning results are provided in this repository as screenshots.
