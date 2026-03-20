@@ -1,0 +1,134 @@
+% Scenario 4 Datalog Program ----------------------------------------------------------
+
+% Original Model -----------------------------------------------------------------
+
+% O0 -------------
+
+Entity(PersonType).
+
+Marker(M).
+hasTag(M, PartitioningPowertype).
+hasCustodian(M, Person).
+refersTo(M, PersonType).
+
+
+% O1 -------------
+
+Entity(Person).
+Entity(MalePerson).
+Entity(FemalePerson).
+Entity(MixedPerson).
+
+hasDeclaredType(MalePerson, PersonType).
+hasDeclaredType(FemalePerson, PersonType).
+
+Categorization(C1).
+Intercalation(I1).
+Intercalation(I2).
+Intercalation(I3).
+hasCustodian(I1, C1).
+hasCustodian(I2, C1).
+hasCustodian(I3, C1).
+hasTag(I1, Specialization).
+hasTag(I2, Specialization).
+hasTag(I3, Generalization).
+involvesType(I1, MalePerson).
+involvesType(I2, FemalePerson).
+involvesType(I3, Person).
+
+Categorization(C2).
+Intercalation(I4).
+Intercalation(I5).
+hasCustodian(I4, C2).
+hasCustodian(I5, C2).
+hasTag(I4, Specialization).
+hasTag(I5, Generalization).
+involvesType(I4, MixedPerson).
+involvesType(I5, MalePerson).
+
+Categorization(C3).
+Intercalation(I6).
+Intercalation(I7).
+hasCustodian(I6, C3).
+hasCustodian(I7, C3).
+hasTag(I6, Specialization).
+hasTag(I7, Generalization).
+involvesType(I6, MixedPerson).
+involvesType(I7, FemalePerson).
+
+
+% Overlay Derivation Rules (Rule set R4 = R3 ∪ ∆R4) ---------------
+
+% Rule set R3 ----------------------------
+
+subPropertyOf(?X, ?Y) :- hasName(?P, ?X), hasCustodian(?M, ?X), hasTag(?M, SubsetOf), refersTo(?M, ?Y).
+@export subPropertyOf :- csv{}.
+
+subClassOf(?X, ?Y) :- involvesType(?I1, ?X), hasCustodian(?I1, ?C1), hasTag(?I1, Specialization), hasCustodian(?I2, ?C1), hasTag(?I2, Generalization), involvesType(?I2, ?Y).
+subClassOf(?X, ?Y) :- subClassOf(?X, ?Z), subClassOf(?Z, ?Y).
+@export subClassOf :- csv{}.
+
+type(?X, ?Y) :- hasDeclaredType(?X, ?Y).
+type(?X, ?Y) :- hasDeclaredType(?X, ?Z), subClassOf(?Z, ?Y).
+type(?X, ?Y) :- type(?X, ?T), type(?T, ?Y).
+@export type :- csv{}.
+
+propertyAssertion(?S, ?N1, ?O):- isConnectedTo(?P1, ?S), hasCustodian(?P1, ?R), hasCustodian(?P, ?R), isConnectedTo(?P, ?O), hasName(?P, ?N1), ?N1 != Undefined, ?P != ?P1.
+propertyAssertion(?S, ?P, ?O):- isConnectedTo(?P1, ?S), hasCustodian(?P1, ?R), hasCustodian(?P, ?R), isConnectedTo(?P, ?O), hasName(?P, ?N1), ?N1 = Undefined, ?P != ?P1.
+@export propertyAssertion :- csv{}.
+
+roleClass(?C) :- Marker(?M), hasTag(?M, role), hasCustodian(?M, ?C).
+
+inducedProperty(?P, ?X) :- Participation(?P), hasName(?P, ?X), ?X != Undefined.
+inducedProperty(?P, ?X) :-Participation(?P), hasName(?P, Undefined), isConnectedTo(?P, ?X), roleClass(?X).
+@export inducedProperty :- csv{}.
+
+ObjectProperty(?O) :- inducedProperty(?P, ?O).
+@export ObjectProperty :- csv{}.
+
+otherEndClass(?P, ?X) :- hasCustodian(?P, ?R), hasCustodian(?Q, ?R), ?P != ?Q, isConnectedTo(?Q, ?X).
+
+sameNavigationFamily(?P, ?Q) :- inducedProperty(?P, ?X), inducedProperty(?Q, ?Y), otherEndClass(?P, ?D), otherEndClass(?Q, ?D), ?P != ?Q.
+
+domain(?X, ?D) :- inducedProperty(?P, ?X), otherEndClass(?P, ?D).
+@export domain :- csv{}.
+
+range(?X, ?R) :- inducedProperty(?P, ?X), isConnectedTo(?P, ?R).
+@export range :- csv{}.
+
+subPropertyOf(?X, ?Y) :- inducedProperty(?P, ?X), inducedProperty(?Q, ?Y), sameNavigationFamily(?P, ?Q), domain(?X, ?D), domain(?Y, ?D), range(?X, ?A), range(?Y, ?B), subClassOf(?A, ?B), ?X != ?Y.
+@export subPropertyOf :- csv{}.
+
+InverseOf(?Y, ?Z) :- hasCustodian(?P, ?R), hasCustodian(?Q, ?R), ?P != ?Q, inducedProperty(?P, ?X), hasName(?Q, ?Y), ?Y != Undefined, subPropertyOf(?X, ?Z), ?X != ?Z, ?Y != ?Z.
+@export InverseOf :- csv{}.
+
+
+% Rule set ∆R4 ----------------------------
+
+partitionedBy(?Base, ?PT) :- hasCustodian(?M, ?Base), hasTag(?M, PartitioningPowertype), refersTo(?M, ?PT).
+@export partitionedBy :- csv{}.
+
+subClassOf(?X, ?Base) :- partitionedBy(?Base, ?PT), hasDeclaredType(?X, ?PT).
+@export subClassOf :- csv{}.
+
+type(?X, ?PT) :- partitionedBy(?Base, ?PT), subClassOf(?X, ?Base), ?X != ?Base.
+@export type :- csv{}.
+
+disjointClasses(?X, ?Y) :- hasDeclaredType(?X, ?PT), hasDeclaredType(?Y, ?PT), ?X != ?Y, partitionedBy(?Base, ?PT).
+@export disjointClasses :- csv{}.
+
+
+% Generated Overlay Assertions -------------------------------------
+
+partitionedBy(Person, PersonType).
+
+type(MixedPerson, PersonType).
+
+disjointClasses(MalePerson, FemalePerson).
+disjointClasses(FemalePerson, MalePerson).
+
+subClassOf(MalePerson, Person).
+subClassOf(FemalePerson, Person).
+subClassOf(MixedPerson, Person).
+subClassOf(MixedPerson, MalePerson).
+subClassOf(MixedPerson, FemalePerson).
