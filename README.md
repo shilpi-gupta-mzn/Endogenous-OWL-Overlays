@@ -22,3 +22,7 @@ The implementation follows a structured workflow consisting of rule-based overla
 
 ### Step 4 – Result Visualization
 * The reasoning outcomes are documented and provided in this repository in the form of screenshots.
+
+### Step 5 – Model Update and Additional Assertions
+* The reasoner-inferred assertions are added to the original model as facts (stored in the program files).
+* After execution, additional overlay assertions are generated based on the updated model.
